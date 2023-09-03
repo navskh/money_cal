@@ -7,61 +7,68 @@
   <title>Autocomplete 예제</title>
   <link rel="stylesheet" href="styles.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <style>
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    #saveBtn {
+      margin-right: 20px;
+      /* 예쁜 blue 버튼 */
+      background-color: #4c6aaf;
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+
+    }
+  </style>
 </head>
 
 <body>
-  <h1>정산을 도와드림</h1> <!-- 제목 추가 -->
-  <div class="autocomplete-wrapper">
-    <!-- 첫 번째 Autocomplete -->
-    <div class="autocomplete-container">
-      <input type="text" class="autocomplete-input" id="autocomplete-input1" placeholder="검색어를 입력하세요...">
-      <div id="autocomplete-results1" class="autocomplete-results"></div>
-    </div>
-
-    <!-- 두 번째 Autocomplete -->
-
+  <!-- 결과 저장 버튼  제목 같은 선상에 나오게 수정-->
+  <div class="header">
+    <h1>정산을 도와드림</h1> <!-- 제목 추가 -->
+    <button id="saveBtn" onclick="saveResult()">결과 저장</button>
   </div>
 
+
   <ul id="sortableList">
-    <li>
-      항목 1
-      <div class="autocomplete-container">
-        <input type="text" class="autocomplete-input" id="autocomplete-input" placeholder="검색어를 입력하세요...">
-        <div id="autocomplete-results" class="autocomplete-results"></div>
-      </div>
-    </li>
-    <li>항목 2</li>
-    <li>항목 3</li>
-    <li>항목 4</li>
   </ul>
 
 
+  <script src="menu.json"></script>
   <script src="script.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
-
+  <script src="draggable.js"></script>
   <script>
-    let originIndex = null;
+    function saveResult() {
+      var result = [];
+      var list = document.getElementById("sortableList");
+      var items = list.getElementsByTagName("li");
 
-    new Sortable(sortableList, {
-      group: 'shared',
-      animation: 150,
-      sort: false,
-      onChoose: function (evt) {
-        originIndex = evt.oldIndex;
-      },
-      onEnd: function (evt) {
-        if (evt.oldIndex === originIndex) {
-          const itemEl = evt.item;
-          const prevEl = evt.item.previousElementSibling; // 드래그한 항목의 앞에 있는 항목
-
-          if (prevEl) {
-            prevEl.innerHTML += `, ${itemEl.innerHTML}`;
-            itemEl.remove();
-          }
+      for (var i = 0; i < items.length; ++i) {
+        var inputs = items[i].getElementsByTagName("input");
+        var input = []
+        for (var j = 0; j < inputs.length; ++j) {
+          input.push(inputs[j].value);
         }
+        const thisName = items[i].innerText.replaceAll('\n', '').replaceAll('+', '');
+        result.push({
+          name: thisName,
+          goods: input
+        });
       }
-    });
+      console.log(result)
+      // 여기서 result를 서버로 보내면 됨
+    }
   </script>
+
 </body>
 
 </html>
