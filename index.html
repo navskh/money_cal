@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Autocomplete 예제</title>
+  <title>정산을 도와드림</title>
   <link rel="stylesheet" href="styles.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
   <style>
@@ -14,18 +14,42 @@
       align-items: center;
     }
 
-    #saveBtn {
-      margin-right: 20px;
+    #saveBtn,
+    #showBtn {
+      margin-right: 10px;
       /* 예쁜 blue 버튼 */
       background-color: #4c6aaf;
       border: none;
       color: white;
-      padding: 10px 20px;
+      padding: 5px 10px;
       text-align: center;
       text-decoration: none;
       display: inline-block;
-      font-size: 16px;
+      font-size: 14px;
+      cursor: pointer;
+    }
 
+    #saveBtn:hover,
+    #showBtn:hover {
+      background-color: #3e5f9b;
+    }
+
+    #removeBtn {
+      margin-right: 10px;
+      /* 예쁜 blue 버튼 */
+      background-color: #af4c4c;
+      border: none;
+      color: white;
+      padding: 5px 10px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    #removeBtn:hover {
+      background-color: #9b3e3e;
     }
   </style>
 </head>
@@ -33,8 +57,10 @@
 <body>
   <!-- 결과 저장 버튼  제목 같은 선상에 나오게 수정-->
   <div class="header">
-    <h1>정산을 도와드림</h1> <!-- 제목 추가 -->
+    <h2>정산을 도와드림</h2> <!-- 제목 추가 -->
     <button id="saveBtn" onclick="saveResult()">결과 저장</button>
+    <button id="showBtn" onclick="showResult()">결과 조회</button>
+    <button id="removeBtn" onclick="removeStore()">초기화</button>
   </div>
 
 
@@ -48,24 +74,30 @@
   <script src="draggable.js"></script>
   <script>
     function saveResult() {
-      var result = [];
-      var list = document.getElementById("sortableList");
-      var items = list.getElementsByTagName("li");
+      localStorage.setItem("broList", JSON.stringify(thisBroList));
+      alert('저장되었습니다.');
 
-      for (var i = 0; i < items.length; ++i) {
-        var inputs = items[i].getElementsByTagName("input");
-        var input = []
-        for (var j = 0; j < inputs.length; ++j) {
-          input.push(inputs[j].value);
+    }
+
+    function removeStore() {
+      localStorage.removeItem("broList");
+      alert('초기화되었습니다.')
+      window.location.reload();
+    }
+
+    function showResult() {
+      var list = JSON.parse(localStorage.getItem("broList"));
+      if (list == null) {
+        alert('저장된 결과가 없습니다.');
+      } else {
+        var listStr = "";
+        for (var i = 0; i < list.length; i++) {
+          const thisMoney = list[i].price.reduce((a, b) => a + b, 0);
+          if (thisMoney == 0) continue;
+          listStr += list[i].name + " : " + list[i].menu.join(',') + ' = ' + thisMoney + "원\n";
         }
-        const thisName = items[i].innerText.replaceAll('\n', '').replaceAll('+', '');
-        result.push({
-          name: thisName,
-          goods: input
-        });
+        alert(listStr);
       }
-      console.log(result)
-      // 여기서 result를 서버로 보내면 됨
     }
   </script>
 
