@@ -62,8 +62,10 @@
       left: 50%;
       transform: translate(-50%, -50%);
       background-color: #fff;
-      padding: 20px;
+      padding: 10px;
       box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+      width: 100%;
+      z-index: 100;
     }
 
     .layerContent {
@@ -133,14 +135,23 @@
         for (var i = 0; i < list.length; i++) {
           const thisMoney = list[i].price.reduce((a, b) => a + b, 0);
           if (thisMoney == 0) continue;
-          listStr += list[i].name + " : " + list[i].menu.join(',') + ' = ' + thisMoney + "원\n";
+          listStr += list[i].name + " : " + list[i].menu.join(',') + ' = ' + thisMoney + "원" + "<br>";
         }
+        // 메뉴 같은 것들의 수량을 세어주는 기능도 추가 
+        const menuList = list.map((item) => item.menu).flat();
+        const menuCount = menuList.reduce((acc, cur) => {
+          if (cur == '') return acc;
+          acc[cur] = (acc[cur] || 0) + 1;
+          return acc;
+        }, {});
+        const menuCountStr = Object.keys(menuCount).map((key) => `${key} : ${menuCount[key]}개`).join('<br>');
+        listStr += '<br> <h2> 취합정보 </h2>' + menuCountStr;
         openLayer(listStr);
       }
     }
 
     function openLayer(message) {
-      $('#infoLayer').find('p').text(message);
+      $('#infoLayer').find('p').html(message);
       $('#infoLayer').removeClass('hidden');
     }
 
